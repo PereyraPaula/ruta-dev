@@ -1,0 +1,37 @@
+---
+const { headings } = Astro.props;
+
+const items = (headings ?? []).filter((h: any) => h.depth > 1);
+const topLevelCount = items.filter((h: any) => h.depth === 2).length;
+---
+
+<div class="border border-neutral-800 rounded-lg p-4 mt-14.25">
+  <div
+    class="flex justify-between items-center mb-3 text-xs uppercase tracking-wider text-neutral-500"
+  >
+    <span>En este artículo</span>
+    <span>{topLevelCount} secciones</span>
+  </div>
+
+  <nav>
+    <ul class="space-y-1 text-sm">
+      {
+        items.map((h: any) => {
+          const level = h.depth - 2;
+          return (
+            <li>
+              <a
+                href={`#${h.slug}`}
+                style={`padding-left: ${level * 12 + 8}px`}
+                class="block py-1 pr-2 rounded hover:bg-neutral-800 text-neutral-300 transition-colors"
+              >
+                {level > 0 && <span class="text-neutral-600 mr-1">└</span>}
+                {h.text}
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </nav>
+</div>

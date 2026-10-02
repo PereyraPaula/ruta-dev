@@ -1,0 +1,80 @@
+---
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import Navbar from "../../components/Navbar.astro";
+import Principal from "../../layouts/Principal.astro";
+import Footer from "../../components/Footer.astro";
+import ListTags from "../../components/ListTags.astro";
+import Toc from "../../components/Toc.astro";
+
+export async function getStaticPaths() {
+  const posts: CollectionEntry<"posts">[] = await getCollection("posts");
+
+  return posts.map((post) => ({
+    // El parámetro DEBE llamarse 'id' porque el archivo se llama [id].astro
+    params: { id: post.id },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<"posts">;
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+
+const formattedDate = new Date(post.data.date).toLocaleDateString("es-AR", {
+  day: "2-digit",
+  month: "long",
+  year: "numeric",
+});
+---
+
+<Principal title={post.data.title}>
+  <Navbar />
+  <main
+    class="grid md:grid-cols-[1fr_320px] grid-cols-1 gap-8 container mx-auto px-4 my-15 mt-30"
+  >
+    <div class="min-w-0">
+      <!-- Header -->
+      <header class="mb-10">
+        <ListTags isPost categories={post.data.tags} />
+        <h1 class="text-5xl font-bold leading-tight mb-4">{post.data.title}</h1>
+        <div class="flex items-center gap-4 text-sm text-neutral-400">
+          <time datetime={post.data.date.toISOString()}>
+            {
+              post.data.date.toLocaleDateString("es-AR", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })
+            }
+          </time>
+        </div>
+      </header>
+
+      <!-- Contenido renderizado -->
+      <article
+        class="post-content prose prose-slate prose-invert max-w-none
+        prose-blockquote:bg-terciary
+        prose-blockquote:border-l-4
+        prose-blockquote:border-blue-500
+        prose-blockquote:rounded-lg
+        prose-blockquote:px-6
+        prose-blockquote:py-5
+        prose-blockquote:not-italic
+        prose-blockquote:text-slate-200
+        prose-blockquote:font-normal"
+      >
+        <Content />
+      </article>
+    </div>
+
+    <aside class="hidden md:block sticky top-8 self-start space-y-6">
+      <!-- TOC -->
+      <Toc headings={headings} />
+    </aside>
+  </main>
+  <Footer />
+</Principal>

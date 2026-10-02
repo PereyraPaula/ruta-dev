@@ -1,0 +1,128 @@
+<header
+  class="w-full z-20 fixed bg-terciary px-4 py-3 text-primary font-sans border-b border-neutral/50 top-0"
+>
+  <div class="container mx-auto flex items-center justify-between relative">
+    <div class="flex items-center gap-6">
+      <a href="/" class="flex items-center gap-2">
+        <div
+          class="flex items-center justify-center w-8 h-8 rounded-lg bg-neutral text-secondary font-mono text-sm border border-neutral/50"
+        >
+          &lt;/&gt;
+        </div>
+        <span class="text-lg font-bold tracking-tight">RutaDev</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+        <a href="/" class="relative py-1 text-primary">
+          Inicio
+          <span
+            class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"
+          ></span>
+        </a>
+        <a
+          href="/feed"
+          class="py-1 text-primary/70 hover:text-primary transition-colors"
+          >Feed</a
+        >
+        <a
+          href="/sobre-mi"
+          class="py-1 text-primary/70 hover:text-primary transition-colors"
+          >Sobre mí</a
+        >
+      </nav>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <a
+        href="/rss"
+        class="text-primary/70 hover:text-primary transition-colors"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20 5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"
+          ></path>
+        </svg>
+      </a>
+
+      <button
+        id="mobile-menu-btn"
+        class="md:hidden flex items-center justify-center w-8 h-8 text-primary/70 hover:text-primary transition-colors focus:outline-none"
+        aria-label="Abrir menú"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div
+      id="mobile-menu"
+      class="hidden absolute top-full left-0 w-full mt-4 bg-terciary border p-4 flex-col gap-4 shadow-xl z-50 md:hidden"
+    >
+      <nav class="flex flex-col gap-3 text-sm font-medium">
+        <a href="/" class="py-1 text-primary">Inicio</a>
+        <a
+          href="/feed"
+          class="py-1 text-primary/70 hover:text-primary transition-colors"
+          >Feed</a
+        >
+        <a
+          href="/archivo"
+          class="py-1 text-primary/70 hover:text-primary transition-colors"
+          >Archivo</a
+        >
+        <a
+          href="/sobre-mi"
+          class="py-1 text-primary/70 hover:text-primary transition-colors"
+          >Sobre mí</a
+        >
+      </nav>
+      <div class="relative flex items-center w-full">
+        <svg
+          class="absolute left-3 w-4 h-4 text-primary/50"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input
+          type="text"
+          placeholder="Buscar notas..."
+          class="w-full bg-neutral border rounded-lg py-2 pl-9 pr-4 text-sm text-primary focus:outline-none focus:border-secondary/50 transition-colors"
+        />
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("mobile-menu-btn");
+    const menu = document.getElementById("mobile-menu");
+
+    btn?.addEventListener("click", () => {
+      menu?.classList.toggle("hidden");
+      menu?.classList.toggle("flex");
+    });
+  });
+</script>

@@ -1,0 +1,27 @@
+---
+const { categories, isPost = false } = Astro.props;
+---
+
+<section>
+  {
+    isPost ? (
+      <div class="flex gap-2 mb-4">
+        {categories &&
+          categories.map((tag: string) => (
+            <a
+              href={`/tags/${tag}`}
+              class="text-xs px-2 py-0.5 rounded bg-neutral hover:bg-secondary/20 transition-colors"
+            >
+              #{tag}
+            </a>
+          ))}
+      </div>
+    ) : (
+      <div class="pt-4 flex flex-wrap gap-2 text-[11px] text-primary/50 font-mono">
+        {categories.map((tag: string) => (
+          <a href={`/tags/${tag}`}>#{tag.toLowerCase()}</a>
+        ))}
+      </div>
+    )
+  }
+</section>

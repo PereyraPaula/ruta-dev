@@ -1,0 +1,254 @@
+---
+
+title: "Pattern Matching en TypeScript - Explicado de manera sencilla"
+date: 2025-04-21
+tags: [react, javascript, typescript, web]
+---
+
+`ts-pattern` es una librería de TypeScript para hacer pattern matching, una técnica que permite comparar estructuras de datos de manera elegante y segura. Facilita el manejo de datos complejos, eliminando muchos `if` y `switch` anidados.
+
+Con ts-pattern puedes:
+
+- Escribir código más limpio y seguro.
+- Evitar errores al olvidarte de manejar un caso específico.
+- Tener mejor inferencia de tipos en TypeScript.
+
+## Instalación
+
+Para usar ts-pattern, primero instálalo en tu proyecto:
+
+<block-code lang="bash">
+```bash
+npm install ts-pattern
+```
+</block-code>
+
+También puedes usar yarn o pnpm:
+
+<block-code lang="bash">
+```bash
+yarn add ts-pattern
+```
+</block-code>
+
+<block-code lang="bash">
+```bash
+pnpm add ts-pattern
+```
+</block-code>
+
+## Ejemplo Básico: Reemplazando un switch
+
+Supongamos que tenemos un estado en una aplicación:
+
+<block-code lang="typescript">
+```typescript
+type Estado = "cargando" | "exito" | "error";
+
+const estado: Estado = "exito";
+```
+</block-code>
+
+Con un switch tradicional:
+
+<block-code lang="typescript">
+```typescript
+switch (estado) {
+  case "cargando":
+    console.log("Cargando datos...");
+    break;
+  case "exito":
+    console.log("¡Datos cargados con éxito!");
+    break;
+  case "error":
+    console.log("Hubo un error 😢");
+    break;
+}
+```
+</block-code>
+
+Con ts-pattern, el código es más limpio y seguro:
+
+<block-code lang="typescript">
+```typescript
+import { match } from "ts-pattern";
+
+const mensaje = match(estado)
+  .with("cargando", () => "Cargando datos...")
+  .with("exito", () => "¡Datos cargados con éxito!")
+  .with("error", () => "Hubo un error 😢")
+  .exhaustive(); // Asegura que cubrimos todos los casos
+
+console.log(mensaje);
+```
+</block-code>
+
+¿Qué hace este código?
+`match(estado)` compara el valor de `estado` con diferentes patrones (`"cargando"`, `"exito"`, `"error"`) y ejecuta la función correspondiente.
+
+Ventaja: Si olvidamos manejar un caso, ts-pattern nos avisa en tiempo de compilación.
+
+## Ejemplo con Objetos: Manejo de Errores
+
+Imagina que estás manejando respuestas de una API con diferentes formatos:
+
+<block-code lang="typescript">
+```typescript
+type Respuesta =
+  | { tipo: "ok", data: string }
+  | { tipo: "error", mensaje: string };
+
+const respuesta: Respuesta = { tipo: "error", mensaje: "No encontrado" };
+```
+</block-code>
+
+Con un `if` tradicional:
+
+<block-code lang="typescript">
+```typescript
+if (respuesta.tipo === "ok") {
+  console.log(`Datos: ${respuesta.data}`);
+} else {
+  console.log(`Error: ${respuesta.mensaje}`);
+}
+```
+</block-code>
+
+Con ts-pattern, el código es más elegante:
+
+<block-code lang="typescript">
+```typescript
+const resultado = match(respuesta)
+  .with({ tipo: "ok" }, (r) => `Datos: ${r.data}`)
+  .with({ tipo: "error" }, (r) => `Error: ${r.mensaje}`)
+  .exhaustive();
+
+console.log(resultado);
+```
+</block-code>
+
+¿Qué hace este código?
+Compara `respuesta` con los patrones `{ tipo: "ok" }` y `{ tipo: "error" }`.
+Accede a `r.data` o `r.mensaje` automáticamente sin necesidad de hacer un `if`.
+
+Ventaja: TypeScript infiere el tipo correctamente sin necesidad de hacer `as` o comprobaciones manuales.
+
+## Uso con Expresiones Regulares o Rango de Valores
+
+También puedes hacer matching con números, rangos o expresiones regulares. Por ejemplo, clasificamos edades:
+
+<block-code lang="typescript">
+```typescript
+const edad = 25;
+
+const categoria = match(edad)
+  .when(
+    (e) => e < 18,
+    () => "Menor de edad"
+  )
+  .when(
+    (e) => e >= 18 && e < 65,
+    () => "Adulto"
+  )
+  .when(
+    (e) => e >= 65,
+    () => "Tercera edad"
+  )
+  .otherwise(() => "Desconocido");
+
+console.log(categoria); // "Adulto"
+```
+</block-code>
+
+¿Qué hace este código?
+Usa `.when()` para definir condiciones personalizadas.
+Usa `.otherwise()` como caso por defecto.
+
+Ventaja: Es más declarativo que usar múltiples `if`.
+
+## Tipar `match`
+
+Se puede tipar de forma segura gracias a TypeScript. Normalmente, TypeScript infiere los tipos automáticamente, pero si queremos asegurarnos de que solo acepte ciertos valores, podemos hacerlo manualmente.
+
+Hay dos formas principales de tiparlo:
+
+### 1. Tipado automático (sin definir el tipo)
+
+Cuando pasamos un valor a match, TypeScript ya infiere el tipo:
+
+<block-code lang="typescript">
+```typescript
+import { match } from "ts-pattern";
+
+const estado = "cargando" as "cargando" | "exito" | "error";
+
+const mensaje = match(estado)
+  .with("cargando", () => "Cargando datos...")
+  .with("exito", () => "¡Datos cargados con éxito!")
+  .with("error", () => "Hubo un error 😢")
+  .exhaustive();
+
+console.log(mensaje);
+```
+</block-code>
+
+¿Qué pasa aquí?
+Como `estado` está tipado como `"cargando" | "exito" | "error"`, TypeScript ya valida que match solo acepte esos valores.
+Si olvidamos un caso, TypeScript dará error con `.exhaustive()`.
+Ventaja: No necesitamos definir el tipo manualmente.
+
+### 2. Tipado explícito (definiendo el tipo)
+
+Si queremos ser más estrictos, podemos tipar manualmente `match` con `match<Tipo>()`:
+
+<block-code lang="typescript">
+```typescript
+type Estado = "cargando" | "exito" | "error";
+
+const estado: Estado = "exito";
+
+const mensaje = match<Estado>(estado) // Aquí forzamos el tipo
+  .with("cargando", () => "Cargando datos...")
+  .with("exito", () => "¡Datos cargados con éxito!")
+  .with("error", () => "Hubo un error 😢")
+  .exhaustive();
+
+console.log(mensaje);
+```
+</block-code>
+
+Ventaja: Si `estado` no tiene el tipo correcto, TypeScript mostrará error.
+
+### 3. Extra: Tipado en Objetos
+
+Cuando usamos objetos, también podemos tipar `match` para asegurar que todas las propiedades sean correctas.
+
+Ejemplo con un objeto `Respuesta`:
+
+<block-code lang="typescript">
+```typescript
+type Respuesta =
+  | { tipo: "ok"; data: string }
+  | { tipo: "error"; mensaje: string };
+
+const respuesta: Respuesta = { tipo: "ok", data: "Hola" };
+
+const resultado = match<Respuesta>(respuesta) // Tipamos aquí
+  .with({ tipo: "ok" }, (r) => `Datos: ${r.data}`)
+  .with({ tipo: "error" }, (r) => `Error: ${r.mensaje}`)
+  .exhaustive();
+
+console.log(resultado);
+```
+</block-code>
+
+### Ventaja
+
+- TypeScript detecta automáticamente si olvidamos manejar un tipo de `Respuesta`.
+- `r` dentro de cada `.with()` ya tiene el tipo correcto (`r.data` o `r.mensaje`).
+
+### ¿Necesito tipar `match`?
+
+- No siempre. TypeScript ya infiere los tipos en la mayoría de los casos.
+- Si queremos asegurarnos, podemos usar `match<Tipo>()`.
+- Lo mejor: `.exhaustive()` siempre verifica que no falte ningún caso.

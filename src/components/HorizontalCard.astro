@@ -1,0 +1,22 @@
+---
+import ListTags from "./ListTags.astro";
+
+const { post } = Astro.props;
+---
+
+<article
+  data-post-item
+  data-title={post.data.title}
+  data-tags={(post.data.tags ?? []).join(" ")}
+  class="w-full my-2"
+>
+  <ListTags categories={post.data.tags} />
+  <h3
+    class="text-lg font-bold text-primary mb-2 hover:text-secondary transition-colors leading-snug"
+  >
+    <a href={`/posts/${post.id}`}>{post.data.title}</a>
+  </h3>
+  <div class="line-clamp-1 text-sm text-primary/70 leading-relaxed">
+    <slot />
+  </div>
+</article>

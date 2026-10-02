@@ -1,0 +1,79 @@
+---
+title: "Desarrollo local de módulos Node.js con npm link"
+date: 2024-06-23
+tags: [node]
+---
+
+En el trabajo, manejamos un módulo de nuestra aplicación como un paquete independiente. Antes, para probar cambios, seguía estos pasos:
+
+1. Modificaba el código en el repositorio del paquete.
+2. Publicaba una nueva versión.
+3. Actualizaba la dependencia en la aplicación principal.
+4. Verificaba que todo funcionara.
+
+Para cambios pequeños, a veces editaba directamente el código en `node_modules` y luego copiaba los cambios al repositorio del paquete. Sin embargo, existe una forma más eficiente: **`npm link`**.
+
+## ¿Por qué usar `npm link`?
+
+Permite probar cambios en tiempo real en la aplicación principal sin necesidad de publicar nuevas versiones del paquete.
+
+## Uso básico
+
+1. **Crea un enlace simbólico global** para el módulo:
+
+   <block-code lang="bash">
+   ```bash
+   cd path/to/your/module
+   npm link  # Crea un enlace simbólico global
+   ```
+   </block-code>
+
+2. **Vincula el módulo** a tu proyecto:
+
+   <block-code lang="bash">
+   ```bash
+   cd path/to/your/project
+   npm link <module_name>  # Usa el módulo vinculado
+   ```
+   </block-code>
+
+## Escenarios avanzados
+
+### Múltiples módulos locales
+
+Si trabajas con módulos interdependientes (ej: `module-a` y `module-b`, donde `module-b` depende de `module-a`):
+
+<block-code lang="bash">
+```bash
+cd path/to/module-a
+npm link  # Registra module-a globalmente
+
+cd ../module-b
+npm link  # Registra module-b globalmente
+npm link module-a  # Vincula module-b con module-a
+```
+</block-code>
+
+Esto permite desarrollar y probar módulos interdependientes en tiempo real.
+
+### Gestionar dependencias entre módulos vinculados
+
+Para asegurar que todos los módulos usen las últimas versiones:
+
+- Ejecuta `npm update` en cada módulo.
+- Re-ejecuta `npm link` después de actualizar para sincronizar los cambios.
+
+## Alternativas a `npm link`
+
+| Herramienta | Descripción | Ventajas | Desventajas |
+|-------------|-------------|----------|-------------|
+| **npm link** | Crea enlaces simbólicos para desarrollo local. | Ideal para pruebas en tiempo real. | Solo funciona localmente. |
+| **npm pack** | Genera un archivo `.tgz` del módulo para instalarlo manualmente. | Simula una instalación real. | Requiere reinstalar el paquete manualmente. |
+| **yarn link** | Similar a `npm link`, pero para Yarn. | Integración con Yarn. | Limitado a Yarn. |
+| **Lerna** | Herramienta para gestionar monorepos con múltiples paquetes interdependientes. | Optimizado para monorepos. | Curva de aprendizaje. |
+
+---
+
+Enlaces útiles:
+[Medium](https://medium.com/dailyjs/how-to-use-npm-link-7375b6219557) |
+[ioflood](https://ioflood.com/blog/npm-link/)

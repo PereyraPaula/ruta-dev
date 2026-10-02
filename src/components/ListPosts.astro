@@ -1,0 +1,91 @@
+---
+import { getCollection, render } from "astro:content";
+import HorizontalCard from "./HorizontalCard.astro";
+import ListTags from "./ListTags.astro";
+
+const { posts: postsProp, isHorizontal = false } = Astro.props;
+
+let posts = postsProp;
+if (!posts) {
+  posts = await getCollection("posts");
+  posts.sort(
+    (a: any, b: any) =>
+      new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+  );
+}
+---
+
+<section
+  class={`w-full bg-terciary text-primary font-sans py-12 ${!isHorizontal && "px-4"}`}
+>
+  <div class="container mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-2">
+        <svg
+          class="w-5 h-5 text-secondary"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+          ></path>
+        </svg>
+        <h2 class="text-lg font-bold tracking-tight">Lista de publicaciones</h2>
+      </div>
+      {
+        !isHorizontal && (
+          <a
+            href="/archivo"
+            class="text-sm text-primary/70 hover:text-primary transition-colors flex items-center gap-1"
+          >
+            Explorar todas
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        )
+      }
+    </div>
+
+    <div
+      class={isHorizontal
+        ? `flex flex-row flex-wrap`
+        : `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4`}
+    >
+      {
+        posts.map(async (post: any) => {
+          const { Content } = await render(post);
+          return isHorizontal ? (
+            <HorizontalCard post={post}>
+              <Content />
+            </HorizontalCard>
+          ) : (
+            <article class="flex flex-col justify-between p-5 rounded-xl bg-neutral border border-neutral/50 hover:border-secondary/50 transition-colors group">
+              <div>
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-xs text-primary/50">
+                    {post.data.date.toLocaleDateString("es-AR", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })}
+                  </span>
+                </div>
+                <h3 class="text-lg font-bold text-primary mb-2 group-hover:text-secondary transition-colors leading-snug">
+                  <a href={`/posts/${post.id}`}>{post.data.title}</a>
+                </h3>
+                <div class="line-clamp-3 text-sm text-primary/70 leading-relaxed">
+                  <Content />
+                </div>
+              </div>
+              <ListTags categories={post.data.tags} />
+            </article>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>

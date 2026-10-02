@@ -1,0 +1,72 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-primary: #ffffff;
+  --color-secondary: #3178c6;
+  --color-terciary: #121212;
+  --color-neutral: #1B1B1B;
+
+  --font-sans: 'Inter Variable', sans-serif;
+}
+
+@layer base {
+  blockquote {
+    font-family: var(--font-sans);
+    background-color: #1e1e1e;
+    border-radius: 0.5rem;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    border-left: 4px solid #3b82f6;
+    color: #e2e8f0;
+  }
+
+  blockquote p {
+    line-height: 1.625;
+  }
+
+  blockquote p:last-child {
+    margin-bottom: 0;
+  }
+
+  blockquote strong {
+    color: #ffffff;
+    font-weight: 300;
+  }
+
+  blockquote code {
+    background-color: #2d2d2d;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-family: monospace;
+    font-size: 0.875em;
+    color: #f1f5f9;
+  }
+}
+
+.post-content blockquote {
+  position: relative;
+  /* Espacio superior extra para que el foco no pise el título */
+  padding-top: 2.75rem !important;
+}
+
+.post-content blockquote::before {
+  content: "";
+  position: absolute;
+  top: 1rem;
+  left: 1.5rem;
+  width: 24px;
+  height: 24px;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 fill%3D%22none%22 viewBox%3D%220 0 24 24%22%3E%3Cg fill%3D%22%233178c6%22 fill-rule%3D%22evenodd%22 clip-rule%3D%22evenodd%22%3E%3Cpath d%3D%22M9.25 19.5a.75.75 0 0 1 .75-.75h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1-.75-.75m.667 2.5a.75.75 0 0 1 .75-.75h2.666a.75.75 0 0 1 0 1.5h-2.666a.75.75 0 0 1-.75-.75M4.25 8.218C4.25 4.313 7.804 1.25 12 1.25s7.75 3.063 7.75 6.968v.003c-.01 2.207-.959 4.405-2.645 6.004l-.002.002L16 15.266a.8.8 0 0 0-.249.577 1.907 1.907 0 0 1-1.907 1.907h-3.686a1.907 1.907 0 0 1-1.907-1.907.8.8 0 0 0-.25-.577l-1.103-1.04-.003-.001C5.21 12.625 4.26 10.428 4.25 8.22zm1.5-.002c.008 1.786.78 3.595 2.176 4.92l1.103 1.038c.46.433.721 1.037.721 1.669 0 .225.182.407.407.407h3.686a.407.407 0 0 0 .407-.407c0-.632.261-1.236.721-1.67l1.102-1.037h.001c1.396-1.325 2.168-3.134 2.176-4.92C18.249 5.3 15.535 2.75 12 2.75S5.751 5.3 5.75 8.216%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  fill: var(--color-secondary);
+  background-size: contain;
+}
+
+.prose {
+  :where(blockquote p:first-of-type):not(:where([class~="not-prose"], [class~="not-prose"] *))::before {
+    content: none;
+  }
+}

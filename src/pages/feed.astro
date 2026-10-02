@@ -1,0 +1,88 @@
+---
+import Footer from "../components/Footer.astro";
+import ListPosts from "../components/ListPosts.astro";
+import Navbar from "../components/Navbar.astro";
+import Principal from "../layouts/Principal.astro";
+
+import { getCollection } from "astro:content";
+const posts = await getCollection("posts");
+posts.sort(
+  (a: any, b: any) =>
+    new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+);
+---
+
+<Principal>
+  <Navbar />
+  <main class="mx-auto container my-10 px-8 md:px-0 mt-30">
+    <div class="relative hidden sm:flex items-center">
+      <svg
+        class="absolute left-3 w-4 h-4 text-primary/50 pointer-events-none"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+      <input
+        id="search-input"
+        type="text"
+        placeholder="Buscar publicaciones..."
+        class="w-full min-w-70 h-13.75 bg-neutral border rounded-lg py-1.5 pl-9 pr-16 text-sm text-primary focus:outline-none focus:border-secondary/50 transition-colors"
+      />
+    </div>
+    <section class="my-10">
+      <ListPosts isHorizontal={true} />
+    </section>
+    <Footer />
+  </main>
+</Principal>
+
+<script>
+  const input = document.getElementById(
+    "search-input",
+  ) as HTMLInputElement | null;
+
+  function normalize(text: string): string {
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function filterPosts(query: string) {
+    const term = normalize(query.trim());
+    const items = document.querySelectorAll<HTMLElement>("[data-post-item]");
+
+    items.forEach((item) => {
+      const haystack = normalize(
+        [
+          item.dataset.title ?? "",
+          item.dataset.description ?? "",
+          item.dataset.tags ?? "",
+        ].join(" "),
+      );
+
+      const matches = term === "" || haystack.includes(term);
+      item.style.display = matches ? "" : "none";
+    });
+
+    // Opcional: mostrar mensaje cuando no hay resultados
+    const emptyMsg = document.getElementById("no-results");
+    if (emptyMsg) {
+      const anyVisible = Array.from(items).some(
+        (item) => item.style.display !== "none",
+      );
+      emptyMsg.style.display = anyVisible ? "none" : "block";
+    }
+  }
+
+  input?.addEventListener("input", (e) => {
+    filterPosts((e.target as HTMLInputElement).value);
+  });
+</script>

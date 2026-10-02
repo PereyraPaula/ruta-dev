@@ -1,0 +1,39 @@
+---
+import Footer from "../components/Footer.astro";
+import Navbar from "../components/Navbar.astro";
+import Principal from "../layouts/Principal.astro";
+---
+
+<Principal>
+  <Navbar />
+  <main class="mx-auto container my-10 px-8 md:px-0 mt-30">
+    <h2 class="text-3xl mb-4">Sobre mi</h2>
+    <p class="mb-4">
+      En este blog encontras artículos relacionados con el desarrollo web,
+      desarrollo android y sobre servidores (web o correo). Basicamente, de lo
+      que vaya aprendiendo. Mi objetivo es compartir conocimientos y
+      experiencias para ayudar a otros desarrolladores a mejorar sus habilidades
+      en el caso de que le sirva, y también para tener un espacio donde pueda
+      documentar lo que voy aprendiendo.
+    </p>
+    <h3 class="text-xl font-bold mb-4">Para que sepas un poco sobre mí</h3>
+    <p class="text-lg font-bold text-[#8d8d8d]">Libros que me gustaron</p>
+    <p>
+      Que tengan que ver con el desarrollo, o no necesariamente pero ayudaron
+      igual a mi crecimiento personal o profesional:
+    </p>
+    <ul class="list-disc my-5 pl-8">
+      <li>
+        <a href="https://a.co/d/0aK3kszg" target="_blank"
+          >Roba como un artista, de Austin Kleon</a
+        >
+      </li>
+      <li>
+        <a href="https://a.co/d/0eT88KhZ" target="_blank"
+          >Aprender a promocionar tu trabajo, de Austin Kleon</a
+        >
+      </li>
+    </ul>
+  </main>
+  <Footer />
+</Principal>

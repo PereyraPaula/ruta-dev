@@ -1,0 +1,57 @@
+---
+title: "Configurar un dominio de NIC.ar con Cloudflare y GitHub Pages"
+date: 2026-03-25
+tags: [github]
+---
+
+Si tienes un dominio registrado en NIC.ar y quieres usarlo para tu sitio en GitHub Pages, aquí te dejo los pasos clave para hacerlo sin complicaciones, usando Cloudflare como intermediario. Aunque el proceso es sencillo, no siempre hay información clara sobre cómo hacerlo específicamente con dominios argentinos.
+
+## Resumen del proceso
+
+1. Compra el dominio en NIC.ar.
+2. Delega los DNS a Cloudflare.
+3. Configura los registros DNS en Cloudflare para apuntar a GitHub Pages.
+4. Asocia el dominio en tu repositorio de GitHub.
+
+## Paso a paso
+
+### 1. Agregar el dominio a Cloudflare
+
+- Ingresa a tu cuenta de [Cloudflare](https://www.cloudflare.com/) y haz clic en **"Add site"**.
+- Escribe tu dominio (por ejemplo, `tusitio.com.ar`) y selecciona el plan gratuito.
+- Cloudflare te pedirá que elijas cómo importar los registros DNS. Selecciona la opción: **"Introducir manualmente registros DNS"**.
+- Se abrirá una tabla para configurar los registros DNS. Aquí debes agregar los siguientes registros:
+
+### 2. Configurar los registros DNS en Cloudflare
+
+#### Registros para el dominio raíz (apuntan a GitHub Pages)
+
+Agrega **4 registros de tipo A** con las siguientes IP de GitHub:
+
+| Tipo | Nombre | IP               |
+|------|--------|------------------|
+| A    | @      | 185.199.108.153  |
+| A    | @      | 185.199.109.153  |
+| A    | @      | 185.199.110.153  |
+| A    | @      | 185.199.111.153  |
+
+#### Registro para el subdominio `www`
+
+Agrega **1 registro de tipo CNAME**:
+
+| Tipo  | Nombre | Valor                     |
+|-------|--------|---------------------------|
+| CNAME | www    | `tuusuario.github.io`     |
+
+> **Importante:** En cada registro, verás un ícono de nube (☁️). Si está en **naranja**, significa que el proxy de Cloudflare está activado. **Desactívalo** (debe quedar en gris) para evitar problemas de configuración inicial. Se puede activar después de que los DNS se propaguen.
+
+Guarda los cambios. Luego Cloudflare te proporcionará **dos nameservers**. Copia estos valores.
+
+### 3. Delegar los DNS en NIC.ar
+
+A. Inicia sesión en tu cuenta de [NIC.ar](https://nic.ar/).
+B. Ve a la sección de gestión de tu dominio y busca la opción para **cambiar los nameservers**.
+C. Pega los dos nameservers que copiaste de Cloudflare.
+D. Guarda los cambios.
+
+> **Nota:** La propagación de los DNS puede tardar entre **30 minutos y 48 horas**. Puedes verificar el estado de la propagación usando herramientas como [DNS Checker](https://dnschecker.org/).

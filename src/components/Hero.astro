@@ -1,0 +1,74 @@
+---
+import { getCollection } from "astro:content";
+import { obtenerTiempoTranscurrido } from "../utils/functions";
+
+const posts = await getCollection("posts");
+const amountPosts = posts.length || 0;
+const postOrganized = posts.sort(
+  (a: any, b: any) =>
+    new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+);
+const lastPost = obtenerTiempoTranscurrido(postOrganized[0].data.date);
+---
+
+<section
+  class="w-full bg-terciary text-primary font-sans px-4 py-12 md:py-24 mt-10"
+>
+  <div class="container mx-auto">
+    <div class="flex flex-col gap-6">
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral border border-neutral/50 text-sm font-medium text-primary/80 self-start"
+      >
+        <span class="w-2 h-2 rounded-full bg-secondary"></span>
+        Paula Pereyra
+      </div>
+
+      <h1
+        class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-balance"
+      >
+        Es un pequeño blog sobre desarrollo web, desarrollo android y
+        servidores.
+      </h1>
+
+      <p class="text-base md:text-lg text-primary/70 max-w-2xl leading-relaxed">
+        Aquí comparto mis experiencias, aprendizajes y recursos útiles para
+        otros desarrolladores que estén interesados en el mundo del desarrollo
+        web.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+        <!-- <div
+          class="flex flex-col gap-1 p-4 rounded-xl bg-neutral border border-neutral/50"
+        >
+          <span
+            class="text-[10px] md:text-xs font-semibold tracking-wider text-primary/50 uppercase"
+            >Notas totales</span
+          >
+          <span class="text-2xl md:text-3xl font-bold text-primary">0</span>
+        </div> -->
+        <div
+          class="flex flex-col gap-1 p-4 rounded-xl bg-neutral border border-neutral/50"
+        >
+          <span
+            class="text-[10px] md:text-xs font-semibold tracking-wider text-primary/50 uppercase"
+            >Tutoriales</span
+          >
+          <span class="text-2xl md:text-3xl font-bold text-primary"
+            >{amountPosts}</span
+          >
+        </div>
+        <div
+          class="flex flex-col gap-1 p-4 rounded-xl bg-neutral border border-neutral/50"
+        >
+          <span
+            class="text-[10px] md:text-xs font-semibold tracking-wider text-primary/50 uppercase"
+            >Última publicación</span
+          >
+          <span class="text-sm md:text-base text-secondary mt-1"
+            >{lastPost}</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

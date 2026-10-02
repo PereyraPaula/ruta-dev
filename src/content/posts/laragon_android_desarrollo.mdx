@@ -1,0 +1,146 @@
+---
+title: "Acceder a proyectos WordPress de Laragon desde el celular (HTTPS)"
+date: 2026-06-14
+tags: [wordpress, server, web]
+---
+
+Pequeño resumen de como hice para poder probar mi WordPress local en el celular, manteniendo HTTPS y usando dominios `.test`.
+
+## ¿Cual es la idea?
+
+- **Laragon** crea sitios locales con dominios como `miapp.test`
+- **Tu PC** entiende esos dominios, pero tu **celular no** (no sabe qué es `.test`)
+- La solución es **enseñarle a tu celular** la IP de tu PC y el nombre del dominio
+- Tu proyecto usa **HTTPS** → necesitas mantener el dominio, no valen las IPs
+
+
+## Requisitos previos
+
+1. **Laragon instalado** en tu PC (con Apache, PHP, MySQL)
+2. **WordPress funcionando** en una carpeta dentro de `C:\laragon\www\`
+3. Tu PC y celular **conectados al mismo WiFi**
+
+---
+
+## Paso 1: Crear el Virtual Host en Laragon
+
+Cuando entras desde tu celular a `https://tuproyecto.test` y ves la página "Server is running", significa que Laragon no sabe qué carpeta mostrar.
+
+✅ Solución:
+
+1. Haz clic derecho en el icono de **Laragon** (bandeja del sistema)
+2. Ve a **Quick add** → **Virtual Host**
+3. En **Domain**, escribe: `nombre-de-tu-proyecto.test` (ej. `hoteles.test`)
+4. En **Directory**, selecciona la carpeta de tu proyecto:
+   `C:\laragon\www\hoteles-urdinarrain`
+5. Haz clic en **Add**
+6. **Reinicia Laragon**: clic derecho → **Restart All**
+
+> 🔁 Si usas "Menu" > "www" > tu carpeta, Laragon también te ofrece crear el Virtual Host automáticamente.
+
+
+## Paso 2: Encontrar la IP de tu PC
+
+Tu celular necesita saber a qué número (IP) enviar la petición.
+
+1. Abre **Símbolo del sistema (CMD)** en tu PC
+2. Escribe: `ipconfig`
+3. Busca **IPv4** (normalmente empieza por `192.168.x.x`)
+
+
+## Paso 3: Configurar el DNS en tu celular
+
+Aquí "enganchamos" el dominio `.test` con la IP de tu PC en tu celular.
+
+### Android
+
+Yo use esta y me funcionó [personalDNSfilter en Google Play](https://play.google.com/store/apps/details?id=dnsfilter.android&hl=en-US)
+
+**Pasos:**
+
+1. Abre la app, ve a **Ajustes Avanzados** o **Configuración**
+2. Busca **Configurar hosts adicionales**
+3. Añade una línea como esta:
+<block-code lang="cmd">
+  ```cmd
+   nombre-de-tu-proyecto.test   192.168.1.45
+  ```
+</block-code>
+
+(Reemplaza la IP por la tuya y el nombre del proyecto por el que usaste)
+4. Vuelve a la pantalla principal y pulsa **Reiniciar** o **Start**
+
+### iPhone: **DNSCloak**
+
+Busqué y encontré esta que puede servir [DNSCloak en App Store](https://apps.apple.com/co/app/dns-cloak-private-dns-changer/id6468986859)
+
+**Pasos: (No está probado pero investigando vi que puede funcionar)**
+
+1. Abre **Notas** y escribe una línea con:
+<block-code lang="cmd">
+  ```cmd
+   nombre-de-tu-proyecto.test   192.168.1.45
+  ```
+</block-code>
+2. Comparte la nota → **Guardar en Archivos** (como `mi-proyecto.txt`)
+3. Abre **DNSCloak**, ve a **Ajustes Avanzados** → **Enable Cloaking**
+4. Selecciona el archivo `.txt` que guardaste
+5. Elige un servidor DNS (cualquiera, ej. AdGuard)
+6. Activa el cloaking
+
+
+## Paso 4: Acceder desde el navegador del celular
+
+1. Conecta el celular al **mismo WiFi** que tu PC
+2. Abre Chrome, Safari o el navegador que uses
+3. Escribe exactamente:
+<block-code lang="cmd">
+  ```cmd
+   https://nombre-de-tu-proyecto.test
+  ```
+</block-code>
+(sin `www`, sin puertos, sin IP)
+
+⚠️ **Advertencia de seguridad (normal)**: Al usar HTTPS con un certificado autofirmado de Laragon, tu celular mostrará algo como:
+
+> "Conexión no privada" o "El certificado no es válido"
+
+**Solución:**
+Pulsa **Avanzado** → **Proceder a nombre-de-tu-proyecto.test** (o **Continuar de todas formas**)
+
+Tu celular recordará esta excepción para futuras visitas.
+
+
+## Paso 5: Comprobación final
+
+- ✅ Accedes a `https://tuproyecto.test` desde el celular
+- ✅ Ves tu WordPress (no la página "Server is running")
+- ✅ Los estilos CSS y JS cargan correctamente
+- ✅ Los enlaces internos funcionan
+
+
+## Lo que NO debes hacer (por experiencia)
+
+No uses la IP local directamente como `https://192.168.1.45`, mejor emplea un dominio local como `https://tuproyecto.test`. Evita también usar la IP con subcarpetas del tipo `/subcarpeta`, lo correcto es crear un Virtual Host con ese nombre. No necesitas modificar las URLs en la base de datos si usas dominios `.test`. Por último, asegúrate de que el dominio configurado en el DNS coincida exactamente con el del Virtual Host.
+
+
+## 💡 Extra: Cómo usar esto en otro proyecto
+
+Si empiezas un nuevo proyecto:
+
+1. Crea tu WordPress en `C:\laragon\www\nuevo-proyecto`
+2. Crea un Virtual Host con **Quick add** → dominio `nuevo.test`
+3. Reinicia Laragon
+4. En el celular, edita la línea del DNS:
+   - Android: `>nuevo.test   192.168.x.x`
+   - iOS: `nuevo.test 192.168.x.x`
+5. Reinicia la app de DNS en el celular
+6. Abre `https://nuevo.test`
+
+> La IP de tu PC puede cambiar si reinicias el router. Si deja de funcionar, repite el `ipconfig` y actualiza la IP en la app de DNS.
+
+## Algunas soluciones a problemas rápidos
+
+Si sigues viendo la página de bienvenida de Laragon, probablemente no creaste el Virtual Host o no reiniciaste Laragon después de crearlo. Si aparece "No se puede conectar", verifica que tu celular y PC estén conectados a la misma red WiFi.<br />
+Un mensaje de "Conexión rechazada" suele deberse al firewall de Windows bloqueando Apache o Nginx. Si el sitio se ve sin CSS y desordenado, significa que estás entrando por IP directamente o usando `http://` en lugar de `https://`.<br />
+Por último, si el certificado SSL da un error grave que no te deja continuar, asegúrate de estar usando `https://` con un dominio `.test`.
