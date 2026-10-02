@@ -15,70 +15,70 @@ El escenario que tenia es el siguiente:
 
 ## Fase 0 - Preparación y accesos
 
-- [ ] Confirmar con el cliente fecha/horario de la migración (idealmente de bajo tráfico, ej. madrugada)
-- [ ] Avisar al cliente que habrá una ventana de mantenimiento (aunque sea corta)
-- [ ] Acceso **SSH habilitado** en DirectAdmin (recomendado: es más rápido y confiable para tar/mysqldump de sitios grandes, aunque se puede hacer desde el panel)
-- [ ] Verificar versión de PHP del hosting final vs. la que usa el sitio nuevo (deben coincidir o el nuevo debe ser compatible)
-- [ ] Verificar **versión** de **MySQL/MariaDB igual** entre ambos entornos
-- [ ] **Anotar credenciales** actuales:<br/>
+- Confirmar con el cliente fecha/horario de la migración (idealmente de bajo tráfico, ej. madrugada)
+- Avisar al cliente que habrá una ventana de mantenimiento (aunque sea corta)
+- Acceso **SSH habilitado** en DirectAdmin (recomendado: es más rápido y confiable para tar/mysqldump de sitios grandes, aunque se puede hacer desde el panel)
+- Verificar versión de PHP del hosting final vs. la que usa el sitio nuevo (deben coincidir o el nuevo debe ser compatible)
+- Verificar **versión** de **MySQL/MariaDB igual** entre ambos entornos
+- **Anotar credenciales** actuales:<br/>
 			- FTP/SSH <br/>
 			- Base de datos vieja.<br/>
 			- Base de datos nueva.<br/>
 			- wp-admin de ambos sitios.<br/>
-- [ ] **Instalar/confirmar WP-CLI en el servidor (`wp --info`) — es la herramienta clave para hacer todo esto sin plugins de pago**
-- [ ] Espacio en disco suficiente en el servidor para tener backup viejo + sitio nuevo simultáneamente (revisar cuota del VPS).
+- **Instalar/confirmar WP-CLI en el servidor (`wp --info`) — es la herramienta clave para hacer todo esto sin plugins de pago**
+- Espacio en disco suficiente en el servidor para tener backup viejo + sitio nuevo simultáneamente (revisar cuota del VPS).
 
 ## FASE 1 — Backup completo del sitio VIEJO (antes de tocar nada)
 
-- [ ] Backup de la base de datos completa vía SSH:
+- Backup de la base de datos completa vía SSH:
   <block-code lang="mysql">
   ```js
   mysqldump -u usuario -p nombre_bd_vieja > backup_bd_vieja_$(date +%Y%m%d).sql
   ```
   </block-code>
   (Preferible a phpMyAdmin: sin límites de tamaño/timeout, más confiable para Multisite con varias tablas `wp_2_`, `wp_3_`, etc.).
-- [ ] Backup de todos los archivos (wp-content, wp-config.php, .htaccess, uploads de cada subsitio):
+- Backup de todos los archivos (wp-content, wp-config.php, .htaccess, uploads de cada subsitio):
   <block-code lang="bash">
   ```bash
   tar -czvf backup_archivos_viejo_$(date +%Y%m%d).tar.gz /ruta/al/sitio-viejo
   ```
   </block-code>
-- [ ] Descargar AMBOS backups (base de datos + archivos) fuera del servidor (tu compu, Drive, etc.). No dejar un único backup en el mismo VPS.
-- [ ] Verificar que el .sql no esté corrupto/truncado (abrir y chequear que termine con datos, no cortado a la mitad)
-- [ ] Guardar también una lista simple: dominios de cada subsitio, IDs de blog (`wp_blogs`), plugins activos por sitio (por si el cliente pide algo puntual después)
-- [ ] Exportar/anotar registros DNS actuales del dominio (por si hay que revertir)
-- [ ] Confirmar con el cliente que el backup está resguardado y accesible (mandarle copia o link).
+- Descargar AMBOS backups (base de datos + archivos) fuera del servidor (tu compu, Drive, etc.). No dejar un único backup en el mismo VPS.
+- Verificar que el .sql no esté corrupto/truncado (abrir y chequear que termine con datos, no cortado a la mitad)
+- Guardar también una lista simple: dominios de cada subsitio, IDs de blog (`wp_blogs`), plugins activos por sitio (por si el cliente pide algo puntual después)
+- Exportar/anotar registros DNS actuales del dominio (por si hay que revertir)
+- Confirmar con el cliente que el backup está resguardado y accesible (mandarle copia o link).
 
 ## FASE 2 — Backup y preparación del sitio NUEVO (de prueba)
 
-- [ ] Backup de la base de datos del sitio nuevo:
+- Backup de la base de datos del sitio nuevo:
   <block-code lang="bash">
   ```bash
   mysqldump -u usuario -p nombre_bd_nueva > backup_bd_nueva_$(date +%Y%m%d).sql
   ```
   </block-code>
   (Este backup es tu "red de seguridad" durante el proceso de migración en sí — si algo sale mal en el "buscar y reemplazar", se puede volver a este punto).
-- [ ] Backup de archivos del sitio nuevo (wp-content completo):
+- Backup de archivos del sitio nuevo (wp-content completo):
   <block-code lang="bash">
   ```bash
   tar -czvf backup_archivos_nuevo_$(date +%Y%m%d).tar.gz /ruta/al/sitio-prueba
   ```
   </block-code>
-- [ ] Revisar `wp-config.php` del sitio nuevo: anotar nombre de base de datos, usuario, prefijo de tablas (`$table_prefix`)
-- [ ] Anotar la configuración Multisite actual del nuevo: `DOMAIN_CURRENT_SITE`, `PATH_CURRENT_SITE`, `SUBDOMAIN_INSTALL`
-- [ ] Listar los subsitios del nuevo Multisite (Admin de red → Sitios) con sus slugs de subcarpeta
+- Revisar `wp-config.php` del sitio nuevo: anotar nombre de base de datos, usuario, prefijo de tablas (`$table_prefix`)
+- Anotar la configuración Multisite actual del nuevo: `DOMAIN_CURRENT_SITE`, `PATH_CURRENT_SITE`, `SUBDOMAIN_INSTALL`
+- Listar los subsitios del nuevo Multisite (Admin de red → Sitios) con sus slugs de subcarpeta
 
 ## FASE 3 — Limpiar el dominio final (dejarlo listo para recibir el sitio nuevo)
 
-- [ ] Confirmar que el backup de la Fase 1 está OK y descargado (no seguir sin esto)
-- [ ] Eliminar la base de datos vieja (o renombrarla como `_old_borrar` si preferís no borrar todavía, más seguro)
-- [ ] Crear una **base de datos nueva** en el dominio final para recibir la base de datos del sitio de prueba (mismo usuario/permisos que tenía la vieja, para no tener que tocar más configuración de la cuenta)
-- [ ] Vaciar la carpeta de archivos del dominio final (`public_html` o la que corresponda) — o renombrarla como `public_html_old_borrar` en vez de borrar directamente (permite revertir rápido si algo falla)
-- [ ] Verificar que el dominio final sigue apuntando correctamente al hosting (DNS sin cambios, ya que ambos sitios están en el mismo servidor)
+- Confirmar que el backup de la Fase 1 está OK y descargado (no seguir sin esto)
+- Eliminar la base de datos vieja (o renombrarla como `_old_borrar` si preferís no borrar todavía, más seguro)
+- Crear una **base de datos nueva** en el dominio final para recibir la base de datos del sitio de prueba (mismo usuario/permisos que tenía la vieja, para no tener que tocar más configuración de la cuenta)
+- Vaciar la carpeta de archivos del dominio final (`public_html` o la que corresponda) — o renombrarla como `public_html_old_borrar` en vez de borrar directamente (permite revertir rápido si algo falla)
+- Verificar que el dominio final sigue apuntando correctamente al hosting (DNS sin cambios, ya que ambos sitios están en el mismo servidor)
 
 ## FASE 4 — Migrar archivos del sitio nuevo al dominio final
 
-- [ ] Copiar todos los archivos del sitio de prueba a la carpeta del dominio final:
+- Copiar todos los archivos del sitio de prueba a la carpeta del dominio final:
 <block-code lang="bash">
   ```bash
   cp -a /ruta/al/sitio-prueba/. /ruta/al/dominio-final/
@@ -86,20 +86,20 @@ El escenario que tenia es el siguiente:
   </block-code>
  	- Usá **cp -a o rsync -a para conservar los permisos**. Evitá usar mv hasta verificar que todo funcione correctamente.
 	- Copiá todo el contenido de public_html —incluidos wp-admin, wp-includes, wp-content, wp-config.php y .htaccess—, ya que no se trata de un backup, sino de la instalación que quedará operativa.
-- [ ] Verificar permisos de archivos y carpetas (típico WordPress: carpetas 755, archivos 644, `wp-config.php` 640/600)
-- [ ] Confirmar que `wp-content/uploads` se copió completo (suele ser lo más pesado y lo que más se olvida).
+- Verificar permisos de archivos y carpetas (típico WordPress: carpetas 755, archivos 644, `wp-config.php` 640/600)
+- Confirmar que `wp-content/uploads` se copió completo (suele ser lo más pesado y lo que más se olvida).
 
 ## FASE 5 — Migrar la base de datos
 
-- [ ] Importar la base de datos del sitio nuevo a la base de datos recién creada en el dominio final:
+- Importar la base de datos del sitio nuevo a la base de datos recién creada en el dominio final:
 <block-code lang="bash">
   ```bash
   mysql -u usuario -p nombre_bd_final < backup_bd_nueva_YYYYMMDD.sql
   ```
   </block-code>
-- [ ] Editar `wp-config.php` en el dominio final con los datos de la base de datos final (`DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`)
-- [ ] Revisar/ajustar `$table_prefix` en `wp-config.php` si difiere del que trae el .sql importado
-- [ ] Revisar las constantes Multisite en `wp-config.php`, deben quedar apuntando al **dominio final**:
+- Editar `wp-config.php` en el dominio final con los datos de la base de datos final (`DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`)
+- Revisar/ajustar `$table_prefix` en `wp-config.php` si difiere del que trae el .sql importado
+- Revisar las constantes Multisite en `wp-config.php`, deben quedar apuntando al **dominio final**:
 <block-code lang="php">
   ```php
   define('WP_ALLOW_MULTISITE', true);
@@ -116,36 +116,36 @@ El escenario que tenia es el siguiente:
 
 > El sitio de prueba y el dominio final usan el mismo esquema (subcarpetas), así que acá solo cambia el dominio, no la estructura de URL de los subsitios. Aun así conviene usar WP-CLI y no un simple "buscar y reemplazar" de phpMyAdmin, porque hay URLs guardadas en campos serializados (widgets, builders) que un reemplazo de texto plano puede corromper.
 
-- [ ] Para el sitio principal (blog_id 1), reemplazar el dominio base. **Este paso va primero**, porque hasta acá la base de datos todavía tiene las URLs del sitio de prueba, y cualquier comando de WP-CLI que use `--url` o consulte `wp_blogs`/`wp_site` (como `site list`) va a fallar si no encuentra ese dominio registrado:
+- Para el sitio principal (blog_id 1), reemplazar el dominio base. **Este paso va primero**, porque hasta acá la base de datos todavía tiene las URLs del sitio de prueba, y cualquier comando de WP-CLI que use `--url` o consulte `wp_blogs`/`wp_site` (como `site list`) va a fallar si no encuentra ese dominio registrado:
 <block-code lang="bash">
 ```bash
   wp --path=/ruta/al/dominio-final search-replace 'dominio-prueba.com' 'dominio-final.com' --all-tables --precise
 ```
 </block-code>
-- [ ] Recién ahora confirmar que WP-CLI reconoce la instalación con el dominio final:
+- Recién ahora confirmar que WP-CLI reconoce la instalación con el dominio final:
 <block-code lang="bash">
 ```bash
   wp --path=/ruta/al/dominio-final site list
 ```
 </block-code>
   (si esto sigue fallando, revisar `wp_blogs`/`wp_site` a mano, ver más abajo)
-- [ ] Como el sitio nuevo **ya usa subcarpetas** (igual que el destino), no hace falta un `search-replace` aparte por subsitio: el reemplazo general de `dominio-prueba.com` → `dominio-final.com` del paso anterior ya cubre las URLs de todos los subsitios (`dominio-prueba.com/sitio1` → `dominio-final.com/sitio1`), porque el `/sitio1` del path no cambia
-- [ ] Revisar manualmente la tabla `wp_blogs` (o `wp_site`) para confirmar que los `domain` y `path` de cada subsitio quedaron correctos:
+- Como el sitio nuevo **ya usa subcarpetas** (igual que el destino), no hace falta un `search-replace` aparte por subsitio: el reemplazo general de `dominio-prueba.com` → `dominio-final.com` del paso anterior ya cubre las URLs de todos los subsitios (`dominio-prueba.com/sitio1` → `dominio-final.com/sitio1`), porque el `/sitio1` del path no cambia
+- Revisar manualmente la tabla `wp_blogs` (o `wp_site`) para confirmar que los `domain` y `path` de cada subsitio quedaron correctos:
 <block-code lang="mysql">
 ```sql
   SELECT blog_id, domain, path FROM whu_blogs;
 ```
 </block-code>
   Deben quedar todos con `domain = dominio-final.com` y `path` distinto por subsitio (`/`, `/sitio1/`, `/sitio2/`)
-- [ ] Revisar tabla `wp_site` (solo debe tener el dominio final, sin restos del de prueba)
-- [ ] Revisar `wp_X_options` de cada subsitio (`siteurl` y `home`) — usar WP-CLI por sitio para confirmar:
+- Revisar tabla `wp_site` (solo debe tener el dominio final, sin restos del de prueba)
+- Revisar `wp_X_options` de cada subsitio (`siteurl` y `home`) — usar WP-CLI por sitio para confirmar:
 <block-code lang="bash">
 ```bash
   wp --path=/ruta/al/dominio-final option get siteurl --url=dominio-final.com/sitio1
   wp --path=/ruta/al/dominio-final option get home --url=dominio-final.com/sitio1
 ```
 </block-code>
-- [ ] Buscar restos del dominio de prueba en contenido serializado (imágenes, widgets, builders tipo Elementor/Divi que guardan URLs absolutas):
+- Buscar restos del dominio de prueba en contenido serializado (imágenes, widgets, builders tipo Elementor/Divi que guardan URLs absolutas):
 <block-code lang="bash">
 ```bash
   wp --path=/ruta/al/dominio-final search-replace 'dominio-prueba.com' 'dominio-final.com' --all-tables --precise --dry-run
@@ -155,34 +155,34 @@ El escenario que tenia es el siguiente:
 
 ## FASE 7 — .htaccess y estructura de permalinks
 
-- [ ] **Revisar el .htaccess** de Multisite en subcarpetas.<br/>
+- **Revisar el .htaccess** de Multisite en subcarpetas.<br/>
 > Si ambos sitios ya funcionaban como subcarpetas, el `.htaccess` del sitio de prueba debería tener la estructura correcta. Al copiar todo public_html durante la Fase 4, también se copiará este archivo. **No es necesario regenerarlo ni modificarlo**. Solo conviene revisarlo para confirmar que RewriteBase y las rutas **no contengan referencias codificadas** al dominio de prueba. Esto es poco frecuente, pero vale la pena verificarlo.
-- [ ] Ir a **Escritorio de red → Configuración de red** y reguardar permalinks (o desde cada subsitio, Ajustes → Enlaces permanentes → Guardar) para forzar la regeneración de reglas
+- Ir a **Escritorio de red → Configuración de red** y reguardar permalinks (o desde cada subsitio, Ajustes → Enlaces permanentes → Guardar) para forzar la regeneración de reglas
 
 ## FASE 8 — Verificación funcional (antes de avisar al cliente)
 
-- [ ] Cargar el sitio principal (`dominio-final.com`) sin caché (ventana incógnito)
-- [ ] Cargar cada subsitio (`dominio-final.com/sitio1`, `/sitio2`, etc.)
-- [ ] Verificar login a wp-admin del sitio principal y de cada subsitio
-- [ ] Verificar que las imágenes cargan bien (uploads no rotos)
-- [ ] Revisar menús, widgets y páginas clave (home, contacto, etc.)
-- [ ] Probar formularios de contacto si los hay (que envíen bien el mail)
-- [ ] Revisar que no haya "mixed content" (HTTP dentro de HTTPS) — chequear consola del navegador
-- [ ] Verificar certificado SSL activo y correcto en el dominio final (Let's Encrypt vía DirectAdmin si no estaba)
-- [ ] Revisar plugins activos por subsitio, que no falte ninguno activado tras la migración
-- [ ] Comprobar velocidad de carga básica (no debería haber cambiado mucho vs. el sitio de prueba)
-- [ ] Revisar `robots.txt` y que no esté bloqueando la indexación (típico olvido al migrar desde ambiente de prueba, que suele tener "Disallow: /")
-- [ ] Chequear en Ajustes → Lectura que **no** esté tildado "Desalentar que los motores de búsqueda indexen este sitio"
+- Cargar el sitio principal (`dominio-final.com`) sin caché (ventana incógnito)
+- Cargar cada subsitio (`dominio-final.com/sitio1`, `/sitio2`, etc.)
+- Verificar login a wp-admin del sitio principal y de cada subsitio
+- Verificar que las imágenes cargan bien (uploads no rotos)
+- Revisar menús, widgets y páginas clave (home, contacto, etc.)
+- Probar formularios de contacto si los hay (que envíen bien el mail)
+- Revisar que no haya "mixed content" (HTTP dentro de HTTPS) — chequear consola del navegador
+- Verificar certificado SSL activo y correcto en el dominio final (Let's Encrypt vía DirectAdmin si no estaba)
+- Revisar plugins activos por subsitio, que no falte ninguno activado tras la migración
+- Comprobar velocidad de carga básica (no debería haber cambiado mucho vs. el sitio de prueba)
+- Revisar `robots.txt` y que no esté bloqueando la indexación (típico olvido al migrar desde ambiente de prueba, que suele tener "Disallow: /")
+- Chequear en Ajustes → Lectura que **no** esté tildado "Desalentar que los motores de búsqueda indexen este sitio"
 
 ## FASE 9 — Cierre
 
-- [ ] Quitar modo mantenimiento
-- [ ] Enviar sitemap actualizado a Google Search Console (si el cliente tiene cuenta configurada)
-- [ ] Purgar caché del hosting/CDN si aplica (Cloudflare, LiteSpeed Cache, etc.)
-- [ ] Confirmar con el cliente que revise el sitio en vivo
-- [ ] Dejar los backups (viejo y nuevo) guardados fuera del servidor al menos 30 días
-- [ ] Una vez todo confirmado OK por unos días, recién ahí borrar definitivamente `public_html_old_borrar` y la base de datos vieja renombrada (no antes)
-- [ ] Documentar para el cliente: nuevos accesos de wp-admin, qué se migró, fecha de corte
+- Quitar modo mantenimiento
+- Enviar sitemap actualizado a Google Search Console (si el cliente tiene cuenta configurada)
+- Purgar caché del hosting/CDN si aplica (Cloudflare, LiteSpeed Cache, etc.)
+- Confirmar con el cliente que revise el sitio en vivo
+- Dejar los backups (viejo y nuevo) guardados fuera del servidor al menos 30 días
+- Una vez todo confirmado OK por unos días, recién ahí borrar definitivamente `public_html_old_borrar` y la base de datos vieja renombrada (no antes)
+- Documentar para el cliente: nuevos accesos de wp-admin, qué se migró, fecha de corte
 
 ## Notas rápidas de recuperación (por si algo sale mal):
 - Si falla el search & replace: restaurar `backup_bd_nueva_YYYYMMDD.sql` y volver a intentar
