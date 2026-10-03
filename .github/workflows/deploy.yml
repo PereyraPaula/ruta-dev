@@ -41,6 +41,7 @@ jobs:
       - name: Build
         run: pnpm astro build
         env:
+          MODE: ${{ vars.MODE }}
           PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
 
       - name: Upload artifact
