@@ -1,15 +1,14 @@
-// @ts-check
 import { defineConfig } from 'astro/config';
 import { loadEnv } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
-
 import mdx from '@astrojs/mdx';
-const { PUBLIC_SITE_URL, MODE } = loadEnv(import.meta.env.MODE, process.cwd(), '');
 
-// https://astro.build/config
+const { PUBLIC_SITE_URL } = loadEnv(import.meta.env.MODE, process.cwd(), '');
+const isCI = process.env.GITHUB_ACTIONS === 'true';
+
 export default defineConfig({
-  site: PUBLIC_SITE_URL || 'http://localhost:4321',
-  base: MODE === 'production' ? '/ruta-dev' : "/",
+  site: PUBLIC_SITE_URL || (isCI ? 'https://pereyrapaula.github.io' : 'http://localhost:4321'),
+  base: isCI ? '/ruta-dev' : '/',
   integrations: [mdx()],
   vite: {
     plugins: [tailwindcss()],
