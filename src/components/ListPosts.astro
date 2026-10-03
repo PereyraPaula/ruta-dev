@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import HorizontalCard from "./HorizontalCard.astro";
 import ListTags from "./ListTags.astro";
+import { url } from "../utils/functions";
 
 const { posts: postsProp, isHorizontal = false } = Astro.props;
 
@@ -40,7 +41,7 @@ if (!posts) {
       {
         !isHorizontal && (
           <a
-            href="/archivo"
+            href={url("/archivo")}
             class="text-sm text-primary/70 hover:text-primary transition-colors flex items-center gap-1"
           >
             Explorar todas
@@ -75,7 +76,7 @@ if (!posts) {
                   </span>
                 </div>
                 <h3 class="text-lg font-bold text-primary mb-2 group-hover:text-secondary transition-colors leading-snug">
-                  <a href={`/posts/${post.id}`}>{post.data.title}</a>
+                  <a href={url("/posts/" + post.id)}>{post.data.title}</a>
                 </h3>
                 <div class="line-clamp-3 text-sm text-primary/70 leading-relaxed">
                   <Content />

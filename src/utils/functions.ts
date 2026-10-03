@@ -41,3 +41,6 @@ export function obtenerTiempoTranscurrido(fechaPost: Date | string | number): st
 
   return rtf.format(cantidad, unidadActual.nombre);
 }
+
+export const url = (path: string) =>
+  import.meta.env.BASE_URL.replace(/\/$/, '') + path;

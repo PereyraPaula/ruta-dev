@@ -1,9 +1,13 @@
+---
+import { url } from "../utils/functions";
+---
+
 <header
   class="w-full z-20 fixed bg-terciary px-4 py-3 text-primary font-sans border-b border-neutral/50 top-0"
 >
   <div class="container mx-auto flex items-center justify-between relative">
     <div class="flex items-center gap-6">
-      <a href="/" class="flex items-center gap-2">
+      <a href={url("/")} class="flex items-center gap-2">
         <div
           class="flex items-center justify-center w-8 h-8 rounded-lg bg-neutral text-secondary font-mono text-sm border border-neutral/50"
         >
@@ -12,19 +16,19 @@
         <span class="text-lg font-bold tracking-tight">RutaDev</span>
       </a>
       <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
-        <a href="/" class="relative py-1 text-primary">
+        <a href={url("/")} class="relative py-1 text-primary">
           Inicio
           <span
             class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"
           ></span>
         </a>
         <a
-          href="/feed"
+          href={url("/feed")}
           class="py-1 text-primary/70 hover:text-primary transition-colors"
           >Feed</a
         >
         <a
-          href="/sobre-mi"
+          href={url("/sobre-mi")}
           class="py-1 text-primary/70 hover:text-primary transition-colors"
           >Sobre mí</a
         >
@@ -74,19 +78,19 @@
       class="hidden absolute top-full left-0 w-full mt-4 bg-terciary border p-4 flex-col gap-4 shadow-xl z-50 md:hidden"
     >
       <nav class="flex flex-col gap-3 text-sm font-medium">
-        <a href="/" class="py-1 text-primary">Inicio</a>
+        <a href={url("/")} class="py-1 text-primary">Inicio</a>
         <a
-          href="/feed"
+          href={url("/feed")}
           class="py-1 text-primary/70 hover:text-primary transition-colors"
           >Feed</a
         >
         <a
-          href="/archivo"
+          href={url("/archivo")}
           class="py-1 text-primary/70 hover:text-primary transition-colors"
           >Archivo</a
         >
         <a
-          href="/sobre-mi"
+          href={url("/sobre-mi")}
           class="py-1 text-primary/70 hover:text-primary transition-colors"
           >Sobre mí</a
         >

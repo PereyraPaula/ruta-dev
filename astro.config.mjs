@@ -8,7 +8,7 @@ const isCI = process.env.GITHUB_ACTIONS === 'true';
 
 export default defineConfig({
   site: PUBLIC_SITE_URL || (isCI ? 'https://pereyrapaula.github.io' : 'http://localhost:4321'),
-  base: isCI ? '/ruta-dev' : '/',
+  base: '/ruta-dev',
   integrations: [mdx()],
   vite: {
     plugins: [tailwindcss()],
